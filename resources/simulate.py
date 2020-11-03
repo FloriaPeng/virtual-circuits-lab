@@ -2,8 +2,6 @@ from flask_restful import Resource
 from flask import request
 from spice.simulate import Simulator
 
-CIRCUIT_RECEIVED = "{} received"
-
 
 class Simulate(Resource):
 
@@ -15,6 +13,5 @@ class Simulate(Resource):
         print(circuit_json)
         simulator = Simulator(circuit_json)
         output = simulator.simulate_circuit()
-        # return {"message": CIRCUIT_RECEIVED.format(name)}, 201
-        # return circuit_json, 201
-        return output, 201
+
+        return output[0], output[1]
