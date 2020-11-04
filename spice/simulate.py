@@ -4,6 +4,18 @@ from PySpice.Spice.NgSpice.Shared import NgSpiceCommandError
 from PySpice.Unit import *
 
 
+def calculate_voltage(circuit, node1, node2):
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    try:
+        analysis = simulator.operating_point()
+        if node2 == "gnd":
+            return float(analysis[node1]), 201
+        return float(analysis[node1]) - float(analysis[node2]), 201
+
+    except NgSpiceCommandError as e:
+        return {"message": "Invalid circuit simulation, " + str(e)}, 400
+
+
 class Simulator:
 
     def __init__(self, circuit):
@@ -13,6 +25,8 @@ class Simulator:
         logger = Logging.setup_logging()
         circuit_lab = self.circuit
         circuit = Circuit(circuit_lab["name"])
+        output = []
+        message = {}
 
         for element in circuit_lab:
             if element == "V":
@@ -50,13 +64,12 @@ class Simulator:
                               circuit.gnd if capacitor["node2"] == "gnd" else capacitor["node2"],
                               capacitor["value"] @ u_F)
 
-        simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+            elif element == "VM":
+                for voltmeter in circuit_lab["VM"]:
+                    measurement, code = calculate_voltage(circuit, voltmeter["node1"], voltmeter["node2"])
+                    if code == 400:
+                        return measurement, code
+                    output.append(measurement)
+                message["VM"] = output
 
-        try:
-            analysis = simulator.operating_point()
-            for node in (analysis['in'], analysis.out):  # .in is invalid !
-                print('Node {}: {} V'.format(str(node), float(node)))
-            return {"output": float(analysis.out)}, 201
-
-        except NgSpiceCommandError as e:
-            return {"message": "Invalid circuit simulation, " + str(e)}, 400
+        return message, 201
