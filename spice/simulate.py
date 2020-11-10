@@ -16,6 +16,17 @@ def calculate_voltage(circuit, node1, node2):
         return {"message": "Invalid circuit simulation, " + str(e)}, 400
 
 
+def calculate_amp(circuit, ammeter):
+    am_name = "v" + str(ammeter["name"])
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    try:
+        analysis = simulator.operating_point()
+        return float(analysis[am_name]), 201
+
+    except NgSpiceCommandError as e:
+        return {"message": "Invalid circuit simulation, " + str(e)}, 400
+
+
 class Simulator:
 
     def __init__(self, circuit):
@@ -25,7 +36,8 @@ class Simulator:
         logger = Logging.setup_logging()
         circuit_lab = self.circuit
         circuit = Circuit(circuit_lab["name"])
-        output = []
+        volt_output = []
+        amp_output = []
         message = {}
 
         for element in circuit_lab:
@@ -64,12 +76,29 @@ class Simulator:
                               circuit.gnd if capacitor["node2"] == "gnd" else capacitor["node2"],
                               capacitor["value"] @ u_F)
 
+            elif element == "AM":
+                for ammeter in circuit_lab["AM"]:
+                    circuit.V(ammeter["name"],
+                              circuit.gnd if ammeter["node1"] == "gnd" else ammeter["node1"],
+                              circuit.gnd if ammeter["node2"] == "gnd" else ammeter["node2"],
+                              ammeter["value"] @ u_V)
+
+        for element in circuit_lab:
+            if element == "AM":
+                for ammeter in circuit_lab["AM"]:
+                    measurement, code = calculate_amp(circuit, ammeter)
+                    if code == 400:
+                        return measurement, code
+                    amp_output.append(measurement)
+                message["AM"] = amp_output
+
             elif element == "VM":
                 for voltmeter in circuit_lab["VM"]:
                     measurement, code = calculate_voltage(circuit, voltmeter["node1"], voltmeter["node2"])
                     if code == 400:
                         return measurement, code
-                    output.append(measurement)
-                message["VM"] = output
+                    volt_output.append(measurement)
+                message["VM"] = volt_output
 
+        print(message)
         return message, 201
