@@ -30,16 +30,21 @@ def calculate_amp(circuit, ammeter):
 class Simulator:
 
     def __init__(self, circuit):
-        self.circuit = circuit
+        self.circuit = circuit  # json format of the circuit
+        self.spice = None  # PySpice circuit
 
-    def simulate_circuit(self):
+    def get_circuit(self):
+        return self.circuit
+
+    def get_spice(self):
+        return self.spice
+
+    def define_circuit(self):
         logger = Logging.setup_logging()
         circuit_lab = self.circuit
         circuit = Circuit(circuit_lab["name"])
-        volt_output = []
-        amp_output = []
-        message = {}
 
+        # add all elements to the PySpice circuit
         for element in circuit_lab:
             if element == "V":
                 for dc_voltage_source in circuit_lab["V"]:
@@ -83,6 +88,16 @@ class Simulator:
                               circuit.gnd if ammeter["node2"] == "gnd" else ammeter["node2"],
                               ammeter["value"] @ u_V)
 
+        self.spice = circuit
+
+    def circuit_op(self):
+        circuit_lab = self.circuit
+        circuit = self.spice
+        volt_output = []
+        amp_output = []
+        message = {}
+
+        # get measurements
         for element in circuit_lab:
             if element == "AM":
                 for ammeter in circuit_lab["AM"]:
@@ -102,3 +117,6 @@ class Simulator:
 
         print(message)
         return message, 201
+
+    def circuit_runtime(self):
+        pass
