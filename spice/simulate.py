@@ -8,9 +8,9 @@ def calculate_voltage(circuit, node1, node2):
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     try:
         analysis = simulator.operating_point()
-        if node2 == "gnd":
-            return float(analysis[node1]), 201
-        return float(analysis[node1]) - float(analysis[node2]), 201
+        pos = 0 if node1 == "gnd" else float(analysis[node1])
+        neg = 0 if node2 == "gnd" else float(analysis[node2])
+        return pos - neg, 201
 
     except NgSpiceCommandError as e:
         return {"message": "Invalid circuit simulation, " + str(e)}, 400
@@ -104,7 +104,7 @@ class Simulator:
                     measurement, code = calculate_amp(circuit, ammeter)
                     if code == 400:
                         return measurement, code
-                    amp_output.append(measurement)
+                    amp_output.append({ammeter["name"]: measurement})
                 message["AM"] = amp_output
 
             elif element == "VM":
@@ -112,7 +112,7 @@ class Simulator:
                     measurement, code = calculate_voltage(circuit, voltmeter["node1"], voltmeter["node2"])
                     if code == 400:
                         return measurement, code
-                    volt_output.append(measurement)
+                    volt_output.append({voltmeter["name"]: measurement})
                 message["VM"] = volt_output
 
         print(message)
