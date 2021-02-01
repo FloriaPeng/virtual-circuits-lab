@@ -17,7 +17,7 @@ def calculate_voltage(circuit, node1, node2):
 
 
 def calculate_amp(circuit, ammeter):
-    am_name = "v" + str(ammeter["name"])
+    am_name = "v" + str(ammeter["id"])
     simulator = circuit.simulator(temperature=25, nominal_temperature=25)
     try:
         analysis = simulator.operating_point()
@@ -48,42 +48,42 @@ class Simulator:
         for element in circuit_lab:
             if element == "V":
                 for dc_voltage_source in circuit_lab["V"]:
-                    circuit.V(dc_voltage_source["name"],
+                    circuit.V(dc_voltage_source["id"],
                               circuit.gnd if dc_voltage_source["node1"] == "gnd" else dc_voltage_source["node1"],
                               circuit.gnd if dc_voltage_source["node2"] == "gnd" else dc_voltage_source["node2"],
                               dc_voltage_source["value"] @ u_V)
 
             elif element == "I":
                 for dc_current_source in circuit_lab["I"]:
-                    circuit.I(dc_current_source["name"],
+                    circuit.I(dc_current_source["id"],
                               circuit.gnd if dc_current_source["node1"] == "gnd" else dc_current_source["node1"],
                               circuit.gnd if dc_current_source["node2"] == "gnd" else dc_current_source["node2"],
                               dc_current_source["value"] @ u_A)
 
             elif element == "R":
                 for resistor in circuit_lab["R"]:
-                    circuit.R(resistor["name"],
+                    circuit.R(resistor["id"],
                               circuit.gnd if resistor["node1"] == "gnd" else resistor["node1"],
                               circuit.gnd if resistor["node2"] == "gnd" else resistor["node2"],
                               resistor["value"] @ u_Ω)
 
             elif element == "L":
                 for inductor in circuit_lab["L"]:
-                    circuit.L(inductor["name"],
+                    circuit.L(inductor["id"],
                               circuit.gnd if inductor["node1"] == "gnd" else inductor["node1"],
                               circuit.gnd if inductor["node2"] == "gnd" else inductor["node2"],
                               inductor["value"] @ u_H)
 
             elif element == "C":
                 for capacitor in circuit_lab["C"]:
-                    circuit.C(capacitor["name"],
+                    circuit.C(capacitor["id"],
                               circuit.gnd if capacitor["node1"] == "gnd" else capacitor["node1"],
                               circuit.gnd if capacitor["node2"] == "gnd" else capacitor["node2"],
                               capacitor["value"] @ u_F)
 
             elif element == "AM":
                 for ammeter in circuit_lab["AM"]:
-                    circuit.V(ammeter["name"],
+                    circuit.V(ammeter["id"],
                               circuit.gnd if ammeter["node1"] == "gnd" else ammeter["node1"],
                               circuit.gnd if ammeter["node2"] == "gnd" else ammeter["node2"],
                               ammeter["value"] @ u_V)
