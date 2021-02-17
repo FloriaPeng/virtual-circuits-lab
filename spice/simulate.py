@@ -2,6 +2,7 @@ import PySpice.Logging.Logging as Logging
 from PySpice.Spice.Netlist import Circuit
 from PySpice.Spice.NgSpice.Shared import NgSpiceCommandError
 from PySpice.Unit import *
+import numpy as np
 
 
 def calculate_voltage(circuit, node1, node2):
@@ -22,6 +23,29 @@ def calculate_amp(circuit, ammeter):
     try:
         analysis = simulator.operating_point()
         return float(analysis[am_name]), 201
+
+    except NgSpiceCommandError as e:
+        return {"message": "Invalid circuit simulation, " + str(e)}, 400
+
+
+def display_voltage(circuit, node1, node2, time_interval, step_size):
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    try:
+        analysis = simulator.transient(step_time=step_size, end_time=time_interval)
+        pos = 0 if node1 == "gnd" else np.asarray(analysis[node1])
+        neg = 0 if node2 == "gnd" else np.asarray(analysis[node2])
+        return pos - neg, 201
+
+    except NgSpiceCommandError as e:
+        return {"message": "Invalid circuit simulation, " + str(e)}, 400
+
+
+def display_amp(circuit, ammeter, time_interval, step_size):
+    am_name = "v" + str(ammeter["id"])
+    simulator = circuit.simulator(temperature=25, nominal_temperature=25)
+    try:
+        analysis = simulator.transient(step_time=step_size, end_time=time_interval)
+        return np.asarray(analysis[am_name]), 201
 
     except NgSpiceCommandError as e:
         return {"message": "Invalid circuit simulation, " + str(e)}, 400
@@ -53,12 +77,34 @@ class Simulator:
                               circuit.gnd if dc_voltage_source["node2"] == "gnd" else dc_voltage_source["node2"],
                               dc_voltage_source["value"] @ u_V)
 
+            elif element == "VA":
+                for ac_voltage_source in circuit_lab["VA"]:
+                    circuit.SinusoidalVoltageSource(ac_voltage_source["id"],
+                                                    circuit.gnd if ac_voltage_source["node1"] == "gnd" else
+                                                    ac_voltage_source["node1"],
+                                                    circuit.gnd if ac_voltage_source["node2"] == "gnd" else
+                                                    ac_voltage_source["node2"],
+                                                    amplitude=ac_voltage_source["amplitude"] @ u_V,
+                                                    frequency=ac_voltage_source["frequency"] @ u_Hz,
+                                                    offset=ac_voltage_source["offset"] @ u_V)
+
             elif element == "I":
                 for dc_current_source in circuit_lab["I"]:
                     circuit.I(dc_current_source["id"],
                               circuit.gnd if dc_current_source["node1"] == "gnd" else dc_current_source["node1"],
                               circuit.gnd if dc_current_source["node2"] == "gnd" else dc_current_source["node2"],
                               dc_current_source["value"] @ u_A)
+
+            elif element == "IA":
+                for ac_current_source in circuit_lab["IA"]:
+                    circuit.SinusoidalCurrentSource(ac_current_source["id"],
+                                                    circuit.gnd if ac_current_source["node1"] == "gnd" else
+                                                    ac_current_source["node1"],
+                                                    circuit.gnd if ac_current_source["node2"] == "gnd" else
+                                                    ac_current_source["node2"],
+                                                    amplitude=ac_current_source["amplitude"] @ u_V,
+                                                    frequency=ac_current_source["frequency"] @ u_Hz,
+                                                    offset=ac_current_source["offset"] @ u_V)
 
             elif element == "R":
                 for resistor in circuit_lab["R"]:
@@ -118,5 +164,31 @@ class Simulator:
         print(message)
         return message, 201
 
-    def circuit_runtime(self):
-        pass
+    def circuit_runtime(self, time_interval, step_size):
+        circuit_lab = self.circuit
+        circuit = self.spice
+        volt_output = []
+        amp_output = []
+        message = {}
+
+        # get measurements
+        for element in circuit_lab:
+            if element == "AM":
+                for ammeter in circuit_lab["AM"]:
+                    measurement, code = display_amp(circuit, ammeter, time_interval, step_size)
+                    if code == 400:
+                        return measurement, code
+                    amp_output.append({ammeter["name"]: measurement.tolist()})
+                message["AM"] = amp_output
+
+            elif element == "VM":
+                for voltmeter in circuit_lab["VM"]:
+                    measurement, code = display_voltage(circuit, voltmeter["node1"], voltmeter["node2"],
+                                                        time_interval, step_size)
+                    if code == 400:
+                        return measurement, code
+                    volt_output.append({voltmeter["name"]: measurement.tolist()})
+                message["VM"] = volt_output
+
+        print(message)
+        return message, 201

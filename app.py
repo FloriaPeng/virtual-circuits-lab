@@ -9,7 +9,7 @@ from blacklist import BLACKLIST
 from resources.user import UserRegister, UserLogin, User, TokenRefresh, UserLogout
 from resources.item import Item, ItemList
 from resources.store import Store, StoreList
-from resources.simulate import DCSimulate, ACSimulate
+from resources.simulate import StaticSimulator, DynamicSimulator
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
@@ -53,8 +53,8 @@ api.add_resource(User, "/user/<int:user_id>")
 api.add_resource(UserLogin, "/login")
 api.add_resource(TokenRefresh, "/refresh")
 api.add_resource(UserLogout, "/logout")
-api.add_resource(DCSimulate, "/dc_simulate/<string:name>")
-api.add_resource(ACSimulate, "/ac_simulate/<string:name>")
+api.add_resource(StaticSimulator, "/static_simulator/<string:name>")
+api.add_resource(DynamicSimulator, "/dynamic_simulator/<string:name>")
 
 if __name__ == "__main__":
     db.init_app(app)

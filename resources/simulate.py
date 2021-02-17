@@ -3,7 +3,7 @@ from flask import request
 from spice.simulate import Simulator
 
 
-class DCSimulate(Resource):
+class StaticSimulator(Resource):
 
     @classmethod
     def post(cls, name: str):
@@ -18,7 +18,7 @@ class DCSimulate(Resource):
         return output[0], output[1]
 
 
-class ACSimulate(Resource):
+class DynamicSimulator(Resource):
 
     @classmethod
     def post(cls, name: str):
@@ -28,6 +28,6 @@ class ACSimulate(Resource):
         print(circuit_json)
         simulator = Simulator(circuit_json)
         simulator.define_circuit()
-        output = simulator.circuit_runtime()
+        output = simulator.circuit_runtime(circuit_json["time_interval"], circuit_json["step_size"])
 
         return output[0], output[1]
