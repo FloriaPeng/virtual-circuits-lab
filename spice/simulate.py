@@ -68,10 +68,14 @@ class Simulator:
     def get_spice(self):
         return self.spice
 
+    # TODO A+S
+    # maybe add a def like define_subcircuit
+    # https://pyspice.fabrice-salvaire.fr/releases/v1.4/api/PySpice/Spice/Netlist.html
     def define_circuit(self):
         logger = Logging.setup_logging()
         circuit_lab = self.circuit
-        circuit = Circuit(circuit_lab["name"])
+        circuit = Circuit(circuit_lab["name"])  # Circuit is imported from PySpcie (it is a Netlist)
+        # There's a method SubCircuitElement that is from class Pyspice.spice.Netlist.Netlist
         # libraries_path = find_libraries()
 
         python_file = os.path.abspath(sys.argv[0])
