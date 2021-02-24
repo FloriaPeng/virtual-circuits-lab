@@ -29,7 +29,9 @@ class DynamicSimulator(Resource):
 
         print(circuit_json)
         simulator = Simulator(circuit_json)
-        simulator.define_circuit()
+        output = simulator.define_circuit()
+        if output:
+            return {"message": output}, 400
         output = simulator.circuit_runtime(circuit_json["time_interval"], circuit_json["step_size"])
 
         return output[0], output[1]
