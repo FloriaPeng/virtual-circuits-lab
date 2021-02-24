@@ -12,7 +12,9 @@ class StaticSimulator(Resource):
 
         print(circuit_json)
         simulator = Simulator(circuit_json)
-        simulator.define_circuit()
+        output = simulator.define_circuit()
+        if output:
+            return {"message": output}, 400
         output = simulator.circuit_op()
 
         return output[0], output[1]

@@ -1,7 +1,12 @@
 import PySpice.Logging.Logging as Logging
 from PySpice.Spice.Netlist import Circuit
 from PySpice.Spice.NgSpice.Shared import NgSpiceCommandError
+from PySpice.Doc.ExampleTools import find_libraries
+from PySpice.Spice.Library import SpiceLibrary
 from PySpice.Unit import *
+import os
+import sys
+from PySpice.Tools.Path import parent_directory_of
 import numpy as np
 
 
@@ -67,6 +72,14 @@ class Simulator:
         logger = Logging.setup_logging()
         circuit_lab = self.circuit
         circuit = Circuit(circuit_lab["name"])
+        # libraries_path = find_libraries()
+
+        python_file = os.path.abspath(sys.argv[0])
+        examples_root = parent_directory_of(python_file)
+        libraries_path = os.path.join(examples_root, 'libraries')
+
+        spice_library = SpiceLibrary(libraries_path)
+        message = ""
 
         # add all elements to the PySpice circuit
         for element in circuit_lab:
@@ -127,6 +140,17 @@ class Simulator:
                               circuit.gnd if capacitor["node2"] == "gnd" else capacitor["node2"],
                               capacitor["value"] @ u_F)
 
+            elif element == "D":
+                for diode in circuit_lab["D"]:
+                    try:
+                        circuit.include(spice_library[diode["modelType"]])
+                        circuit.X(diode["id"],
+                                  diode["modelType"],
+                                  circuit.gnd if diode["node1"] == "gnd" else diode["node1"],
+                                  circuit.gnd if diode["node2"] == "gnd" else diode["node2"])
+                    except KeyError as e:
+                        message += " " + str(e)
+
             elif element == "AM":
                 for ammeter in circuit_lab["AM"]:
                     circuit.V(ammeter["id"],
@@ -134,7 +158,10 @@ class Simulator:
                               circuit.gnd if ammeter["node2"] == "gnd" else ammeter["node2"],
                               ammeter["value"] @ u_V)
 
-        self.spice = circuit
+        if not message:
+            self.spice = circuit
+            return message
+        return "Undefined model type:" + message
 
     def circuit_op(self):
         circuit_lab = self.circuit
