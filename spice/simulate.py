@@ -1,5 +1,6 @@
 import PySpice.Logging.Logging as Logging
 from PySpice.Spice.Netlist import Circuit
+from PySpice.Spice.Netlist import SubCircuit
 from PySpice.Spice.NgSpice.Shared import NgSpiceCommandError
 from PySpice.Doc.ExampleTools import find_libraries
 from PySpice.Spice.Library import SpiceLibrary
@@ -68,8 +69,59 @@ class Simulator:
     def get_spice(self):
         return self.spice
 
-    # TODO A+S
-    # maybe add a def like define_subcircuit
+    # This definition is to create a subcircuit
+    def define_subcircuit(self):
+        logger = Logging.setup_logging()
+        circuit_lab = self.circuit
+        subcircuit = SubCircuit(circuit_lab["name"])
+
+        python_file = os.path.abspath(sys.argv[0])
+        examples_root = parent_directory_of(python_file)
+        libraries_path = os.path.join(examples_root, 'libraries')
+
+        spice_library = SpiceLibrary(libraries_path)
+        message = ""
+
+        # add all elements to the PySpice circuit
+        for element in circuit_lab:
+            if element == "R":
+                for resistor in circuit_lab["R"]:
+                    subcircuit.R(resistor["id"],
+                              subcircuit.gnd if resistor["node1"] == "gnd" else resistor["node1"],
+                              subcircuit.gnd if resistor["node2"] == "gnd" else resistor["node2"],
+                              resistor["value"] @ u_Ω)
+
+            elif element == "L":
+                for inductor in circuit_lab["L"]:
+                    subcircuit.L(inductor["id"],
+                              subcircuit.gnd if inductor["node1"] == "gnd" else inductor["node1"],
+                              subcircuit.gnd if inductor["node2"] == "gnd" else inductor["node2"],
+                              inductor["value"] @ u_H)
+
+            elif element == "C":
+                for capacitor in circuit_lab["C"]:
+                    subcircuit.C(capacitor["id"],
+                              subcircuit.gnd if capacitor["node1"] == "gnd" else capacitor["node1"],
+                              subcircuit.gnd if capacitor["node2"] == "gnd" else capacitor["node2"],
+                              capacitor["value"] @ u_F)
+
+            elif element == "D":
+                for diode in circuit_lab["D"]:
+                    try:
+                        subcircuit.include(spice_library[diode["modelType"]])
+                        subcircuit.X(diode["id"],
+                                  diode["modelType"],
+                                  subcircuit.gnd if diode["node1"] == "gnd" else diode["node1"],
+                                  subcircuit.gnd if diode["node2"] == "gnd" else diode["node2"])
+                    except KeyError as e:
+                        message += " " + str(e)
+
+        if not message:
+            self.spice = subcircuit
+            return message
+        return "Undefined model type:" + message
+
+    # TODO
     # https://pyspice.fabrice-salvaire.fr/releases/v1.4/api/PySpice/Spice/Netlist.html
     def define_circuit(self):
         logger = Logging.setup_logging()
@@ -161,6 +213,9 @@ class Simulator:
                               circuit.gnd if ammeter["node1"] == "gnd" else ammeter["node1"],
                               circuit.gnd if ammeter["node2"] == "gnd" else ammeter["node2"],
                               ammeter["value"] @ u_V)
+
+            # elif element == "X":
+            #     define_subcircuit()
 
         if not message:
             self.spice = circuit
