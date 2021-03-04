@@ -1,6 +1,6 @@
 from flask_restful import Resource
 from flask import request
-from flask_jwt_extended import jwt_required, fresh_jwt_required
+from flask_jwt_extended import jwt_required #fresh_jwt_required
 from marshmallow import ValidationError
 from models.item import ItemModel
 from schemas.item import ItemSchema
@@ -23,7 +23,7 @@ class Item(Resource):
         return {"message": ITEM_NOT_FOUND}, 404
 
     @classmethod
-    @fresh_jwt_required
+    #@fresh_jwt_required
     def post(cls, name: str):
         if ItemModel.find_by_name(name):
             return {"message": NAME_ALREADY_EXISTS.format(name)}, 400
