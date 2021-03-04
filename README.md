@@ -28,14 +28,17 @@ pyspice-post-installation --check-install
 11. Now, click the run button in PyCharm to run app.py. It should run. 
 
 ## Dealing with CORS Issue:
-1. Attempt one: (use flask_cors module)
+1. Attempt one: (use flask_cors module) - Didn't work
+
 https://flask-cors.readthedocs.io/en/latest/
-Didn't work
-2. Attempt two: (user CORS Chrome extension)
+
+2. Attempt two: (user CORS Chrome extension) - Didn't work
+
 https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf?hl=en
 Need to toggle the extension to ON > In the settings (right click extension and then click Options from drop down menu), keep all default settings and whitelist localhost or 127.0.0.1
-Didn't work
-3. Attempt three: Ran Chrome browser without CORS policy 
+
+3. Attempt three: Ran Chrome browser without CORS policy - Worked 
+
 Followed instructions from this [reference link](https://alfilatov.com/posts/run-chrome-without-cors/)
 This approach worked. However, need to find a way to deal with this issue in a non-sketchy manner that does not include disabling security policies on browsers. This is just a temporary solution that was attempted to resolve the CORS policy issue.
 
