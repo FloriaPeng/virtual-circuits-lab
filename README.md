@@ -35,6 +35,7 @@ https://flask-cors.readthedocs.io/en/latest/
 2. Attempt two: (user CORS Chrome extension) - Didn't work
 
 https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf?hl=en
+
 Need to toggle the extension to ON > In the settings (right click extension and then click Options from drop down menu), keep all default settings and whitelist localhost or 127.0.0.1
 
 3. Attempt three: Ran Chrome browser without CORS policy - Worked 
