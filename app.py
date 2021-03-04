@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from marshmallow import ValidationError
-from flask_cors import CORS
+#from flask_cors import CORS
 from ma import ma
 from db import db
 from blacklist import BLACKLIST
@@ -12,7 +12,7 @@ from resources.store import Store, StoreList
 from resources.simulate import StaticSimulator, DynamicSimulator
 
 app = Flask(__name__)
-CORS(app)
+#CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["PROPAGATE_EXCEPTIONS"] = True
