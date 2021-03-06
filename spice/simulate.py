@@ -69,10 +69,10 @@ class Simulator:
     def get_spice(self):
         return self.spice
 
-    # This definition is to create a subcircuit
-    def define_subcircuit(self):
+    # This definition is to create a subcircuit when we run a circuit
+    def define_subcircuit(self, my_subcircuit):
         logger = Logging.setup_logging()
-        circuit_lab = self.circuit
+        circuit_lab = my_subcircuit
         subcircuit = SubCircuit(circuit_lab["name"])
 
         python_file = os.path.abspath(sys.argv[0])
@@ -214,8 +214,9 @@ class Simulator:
                               circuit.gnd if ammeter["node2"] == "gnd" else ammeter["node2"],
                               ammeter["value"] @ u_V)
 
-            # elif element == "X":
-            #     define_subcircuit()
+            elif element == "X":
+                my_subcircuit = myGlobalArray.get(ID)
+                define_subcircuit(my_subcircuit)
 
         if not message:
             self.spice = circuit

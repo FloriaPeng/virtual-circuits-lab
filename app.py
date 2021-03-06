@@ -56,6 +56,7 @@ api.add_resource(TokenRefresh, "/refresh")
 api.add_resource(UserLogout, "/logout")
 api.add_resource(StaticSimulator, "/static_simulator/<string:name>")
 api.add_resource(DynamicSimulator, "/dynamic_simulator/<string:name>")
+api.add_resource(StaticSimulator, "/subcircuit")  #endpoint to create subcircuit. TODO Name of subcircuit is in the url
 
 if __name__ == "__main__":
     db.init_app(app)
