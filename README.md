@@ -28,20 +28,9 @@ pyspice-post-installation --check-install
 11. Now, click the run button in PyCharm to run app.py. It should run. 
 
 ## Dealing with CORS Issue:
-1. Attempt one: (use flask_cors module) - Didn't work
+CORS issue dealt with: ![cors issue](https://github.com/EDALab/virtual-circuits-lab/blob/abhi_dev/CORS_issue.PNG)
 
-https://flask-cors.readthedocs.io/en/latest/
-
-2. Attempt two: (user CORS Chrome extension) - Didn't work
-
-https://chrome.google.com/webstore/detail/allow-cors-access-control/lhobafahddgcelffkeicbaginigeejlf?hl=en
-
-Need to toggle the extension to ON > In the settings (right click extension and then click Options from drop down menu), keep all default settings and whitelist localhost or 127.0.0.1
-
-3. Attempt three: Ran Chrome browser without CORS policy - Worked 
-
-Followed instructions from this [reference link](https://alfilatov.com/posts/run-chrome-without-cors/)
-This approach worked. However, need to find a way to deal with this issue in a non-sketchy manner that does not include disabling security policies on browsers. This is just a temporary solution that was attempted to resolve the CORS policy issue.
+Used Flask extension `flask-cors` to handle Cross Origin Resource Sharing (CORS) issue. Extension is added as dependency in the Pipfile - it should be installed when running the command `pipenv install` the first time to install all project dependencies in the virtual environment. Otherwise, re-run the command `pipenv install` after pulling this file in the virtual environment to update Pipfile.lock and resolve dependecies for project.
 
 ## To Run
 Run `app.py`.  

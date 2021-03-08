@@ -2,7 +2,7 @@ from flask import Flask, jsonify
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from marshmallow import ValidationError
-#from flask_cors import CORS
+from flask_cors import CORS
 from ma import ma
 from db import db
 from blacklist import BLACKLIST
@@ -12,7 +12,7 @@ from resources.store import Store, StoreList
 from resources.simulate import StaticSimulator, DynamicSimulator
 
 app = Flask(__name__)
-#CORS(app)
+CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["PROPAGATE_EXCEPTIONS"] = True
@@ -56,7 +56,7 @@ api.add_resource(TokenRefresh, "/refresh")
 api.add_resource(UserLogout, "/logout")
 api.add_resource(StaticSimulator, "/static_simulator/<string:name>")
 api.add_resource(DynamicSimulator, "/dynamic_simulator/<string:name>")
-api.add_resource(StaticSimulator, "/subcircuit")  #endpoint to create subcircuit. TODO Name of subcircuit is in the url
+# api.add_resource(StaticSimulator, "/subcircuit")  #endpoint to create subcircuit. TODO Name of subcircuit is in the url
 
 if __name__ == "__main__":
     db.init_app(app)
