@@ -28,7 +28,9 @@ pyspice-post-installation --check-install
 11. Now, click the run button in PyCharm to run app.py. It should run. 
 
 ## Dealing with CORS Issue:
-CORS issue dealt with: ![cors issue](https://github.com/EDALab/virtual-circuits-lab/blob/abhi_dev/CORS_issue.PNG)
+CORS issue dealt with: 
+
+![cors issue](https://github.com/EDALab/virtual-circuits-lab/blob/abhi_dev/CORS_issue.PNG)
 
 Used Flask extension `flask-cors` to handle Cross Origin Resource Sharing (CORS) issue. Extension is added as dependency in the Pipfile - it should be installed when running the command `pipenv install` the first time to install all project dependencies in the virtual environment. Otherwise, re-run the command `pipenv install` after pulling this file in the virtual environment to update Pipfile.lock and resolve dependecies for project.
 
