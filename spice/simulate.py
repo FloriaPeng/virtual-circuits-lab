@@ -156,10 +156,10 @@ class Simulator:
                     try:
                         circuit.include(spice_library[nBJT["modelType"]])
                         circuit.BJT(nBJT["id"],
-                                    nBJT["modelType"],
                                     circuit.gnd if nBJT["node1"] == "gnd" else nBJT["node1"],
                                     circuit.gnd if nBJT["node2"] == "gnd" else nBJT["node2"],
-                                    circuit.gnd if nBJT["node3"] == "gnd" else nBJT["node3"])
+                                    circuit.gnd if nBJT["node3"] == "gnd" else nBJT["node3"],
+                                    model=nBJT["modelType"])
                     except KeyError as e:
                         message += " " + str(e)
 
@@ -168,10 +168,10 @@ class Simulator:
                     try:
                         circuit.include(spice_library[pBJT["modelType"]])
                         circuit.BJT(pBJT["id"],
-                                    pBJT["modelType"],
                                     circuit.gnd if pBJT["node3"] == "gnd" else pBJT["node3"],
                                     circuit.gnd if pBJT["node2"] == "gnd" else pBJT["node2"],
-                                    circuit.gnd if pBJT["node1"] == "gnd" else pBJT["node1"])
+                                    circuit.gnd if pBJT["node1"] == "gnd" else pBJT["node1"],
+                                    model=pBJT["modelType"])
                     except KeyError as e:
                         message += " " + str(e)
 
