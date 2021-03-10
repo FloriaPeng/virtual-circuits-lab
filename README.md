@@ -23,3 +23,9 @@ Use [Postman](https://www.postman.com/) to send HTTP Requests and receive HTTP R
 
 ## PySpice Documentation
 Please refer to [PySpice](https://github.com/FabriceSalvaire/PySpice).
+
+## Acknowledgement
+Aside from the SPICE functions, this backend code structure is built based on a template we studied in a public online course on Udemy, provided by Jose Salvatierra of Teclado
+The course can be found here:
+https://www.udemy.com/share/1026WUAEAaeFlTQnkF/
+https://www.udemy.com/share/101sjYAEAaeFlTQnkF/
