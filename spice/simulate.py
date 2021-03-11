@@ -171,9 +171,9 @@ class Simulator:
                                                     ac_current_source["node1"],
                                                     circuit.gnd if ac_current_source["node2"] == "gnd" else
                                                     ac_current_source["node2"],
-                                                    amplitude=ac_current_source["amplitude"] @ u_V,
+                                                    amplitude=ac_current_source["amplitude"] @ u_A,
                                                     frequency=ac_current_source["frequency"] @ u_Hz,
-                                                    offset=ac_current_source["offset"] @ u_V)
+                                                    offset=ac_current_source["offset"] @ u_A)
 
             elif element == "R":
                 for resistor in circuit_lab["R"]:
@@ -204,6 +204,30 @@ class Simulator:
                                   diode["modelType"],
                                   circuit.gnd if diode["node1"] == "gnd" else diode["node1"],
                                   circuit.gnd if diode["node2"] == "gnd" else diode["node2"])
+                    except KeyError as e:
+                        message += " " + str(e)
+
+            elif element == "nBJT":
+                for nBJT in circuit_lab["nBJT"]:
+                    try:
+                        circuit.include(spice_library[nBJT["modelType"]])
+                        circuit.BJT(nBJT["id"],
+                                    circuit.gnd if nBJT["node1"] == "gnd" else nBJT["node1"],
+                                    circuit.gnd if nBJT["node2"] == "gnd" else nBJT["node2"],
+                                    circuit.gnd if nBJT["node3"] == "gnd" else nBJT["node3"],
+                                    model=nBJT["modelType"])
+                    except KeyError as e:
+                        message += " " + str(e)
+
+            elif element == "pBJT":
+                for pBJT in circuit_lab["pBJT"]:
+                    try:
+                        circuit.include(spice_library[pBJT["modelType"]])
+                        circuit.BJT(pBJT["id"],
+                                    circuit.gnd if pBJT["node3"] == "gnd" else pBJT["node3"],
+                                    circuit.gnd if pBJT["node2"] == "gnd" else pBJT["node2"],
+                                    circuit.gnd if pBJT["node1"] == "gnd" else pBJT["node1"],
+                                    model=pBJT["modelType"])
                     except KeyError as e:
                         message += " " + str(e)
 
